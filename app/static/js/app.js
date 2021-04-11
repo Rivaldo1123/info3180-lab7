@@ -1,10 +1,83 @@
 /* Add your Application JavaScript */
+
+const upload_form = ('upload-form', {
+    name: 'upload_form',
+    template: `
+        <div>
+            <h2> Form Upload </h2>
+            <div>
+                <div>
+                    <ul v-if=''>
+                        <li v-for="resp in response" class="alert alert-success" role='alert'>
+                            {{ resp.message }}
+                        </li>
+                    </ul>
+                    <ul v-else>
+                        <li v-for="resp in error" class="alert alert-danger" role='alert'>
+                            {{ resp.errors[0] }} <br>
+                            {{ resp.errors[1] }}
+                        </li>
+                    </ul>
+                </div>
+                <form @submit.prevent='uploadPhoto' id = 'uploadForm' method = 'POST' enctype="multipart/form-data">
+                    <div class='form-group'>
+                        <label for = 'description'> Description </label>
+                        <textarea type="text" name="description" id="uploadForm" class="form-control mb-2 mr-sm-2" style='min-height: 10rem; height:10rem;' placeholder="Enter description here"></textarea> 
+                    </div>
+                    <div>
+                        <label for = 'photo'> Select a photo: </label> <br>
+                        <input type='file' name = 'photo'> <br>
+                    </div> <br>
+                    <button class='btn bg-primary' type='submit'> Submit </button>
+                </form>
+            </div>
+        </div>
+
+    `,
+    data() {
+        return {
+            response: [],
+            error: []
+        };
+    },
+    methods: {
+        uploadPhoto: function() {
+            let uploadForm = document.getElementById('uploadForm');
+            let form_data = new FormData(uploadForm);
+
+            fetch('/api/upload', {
+                    method: 'POST',
+                    body: form_data,
+                    headers: {
+                        'X-CSRFToken': token
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(jsonResponse) {
+                    // display a success message
+                    console.log(jsonResponse);
+                    self.response = jsonResponse.result;
+                    self.error = jsonResponse.errors;
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+        }
+    }
+});
+
 // Instantiate our main Vue Instance
 const app = Vue.createApp({
     data() {
         return {
 
         }
+    },
+    components: {
+        'upload': upload_form
     }
 });
 
@@ -21,6 +94,9 @@ app.component('app-header', {
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
+          </li>
+          <li class="nav-item active">
+            <router-link class="nav-link" to="/upload/">Upload Form </router-link>
           </li>
         </ul>
       </div>
@@ -73,7 +149,7 @@ const NotFound = {
 const routes = [
     { path: "/", component: Home },
     // Put other routes here
-
+    { path: "/upload/", component: upload_form },
     // This is a catch all route in case none of the above matches
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound }
 ];

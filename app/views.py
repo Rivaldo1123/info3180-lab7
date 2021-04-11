@@ -32,10 +32,10 @@ def index(path):
     return render_template('index.html')
 
 
-@app.route('/api/upload', method=['POST'])
+@app.route('/api/upload', methods=['POST'])
 def upload():
     uploadForm = UploadForm()
-    if request.method == "POST":
+    if request.method == "POST" and uploadForm.validate_on_submit():
         photo = uploadForm.photo.data
         filename = secure_filename(photo.filename)
         photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -43,6 +43,7 @@ def upload():
         description = uploadForm.description.data
         message = "Congratulations.... Your file was successfully uploaded"
         
+        flash(message)
         return { "message":message, "filename":filename, "description":description }
     else:
         flash(form_errors(uploadForm))
