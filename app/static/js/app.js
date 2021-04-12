@@ -6,19 +6,16 @@ const upload_form = ('upload-form', {
         <div>
             <h2> Form Upload </h2>
             <div>
-                <div>
-                    <ul v-if=''>
-                        <li v-for="resp in response" class="alert alert-success" role='alert'>
-                            {{ resp.message }}
-                        </li>
-                    </ul>
-                    <ul v-else>
-                        <li v-for="resp in error" class="alert alert-danger" role='alert'>
-                            {{ resp.errors[0] }} <br>
-                            {{ resp.errors[1] }}
-                        </li>
-                    </ul>
-                </div>
+                <ul>
+                    <li v-for="mess in message" class="alert alert-success" role='alert'>
+                        {{ mess.message }}
+                    </li>
+                
+                    <li v-for="resp in error" class="alert alert-danger" role='alert'>
+                        {{ resp.error[0] }} <br>
+                        {{ resp.error[1] }} 
+                    </li>
+                </ul>
                 <form @submit.prevent='uploadPhoto' id = 'uploadForm' method = 'POST' enctype="multipart/form-data">
                     <div class='form-group'>
                         <label for = 'description'> Description </label>
@@ -36,7 +33,7 @@ const upload_form = ('upload-form', {
     `,
     data() {
         return {
-            response: [],
+            message: [],
             error: []
         };
     },
@@ -59,8 +56,8 @@ const upload_form = ('upload-form', {
                 .then(function(jsonResponse) {
                     // display a success message
                     console.log(jsonResponse);
-                    self.response = jsonResponse.result;
-                    self.error = jsonResponse.errors;
+                    self.message = jsonResponse.message;
+                    self.error = jsonResponse.error;
                 })
                 .catch(function(error) {
                     console.log(error);

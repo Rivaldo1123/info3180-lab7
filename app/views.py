@@ -6,8 +6,8 @@ This file creates your application.
 """
 
 from app import app
-import os, json
-from flask import render_template, request, flash
+import os
+from flask import render_template, request, flash, jsonify
 from .forms import UploadForm
 from werkzeug.utils import secure_filename
 
@@ -41,13 +41,10 @@ def upload():
         photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
         description = uploadForm.description.data
-        message = "Congratulations.... Your file was successfully uploaded"
-        
-        flash(message)
-        return { "message":message, "filename":filename, "description":description }
+        return jsonify({ "message":"Congratulations.... Your file was successfully uploaded",
+                    "filename":filename, "description":description })
     else:
-        flash(form_errors(uploadForm))
-        return {"errors": [{},{}]}
+        return jsonify({"errors": [form_errors(uploadForm)]})
 
 
 # Here we define a function to collect form errors from Flask-WTF
